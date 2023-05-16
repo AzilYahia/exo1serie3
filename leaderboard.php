@@ -1,53 +1,8 @@
 <?php
-//
-//mysqli_connect("localhost", "root", "", "TP3")->query("SET NAMES utf8");
-//
-//$result = mysqli_connect("localhost", "root", "", "TP3")->query("SELECT * FROM jeu ORDER BY attempts ASC , temps_ecoule ASC");
-//
-//?>
-<!---->
-<!---->
-<!--<!DOCTYPE html>-->
-<!--<html lang="en">-->
-<!--<head>-->
-<!--    <meta charset="UTF-8">-->
-<!--    <title>Leaderboard</title>-->
-<!--</head>-->
-<!--<body style="text-align: center">-->
-<!--<h1>Leaderboard : </h1>-->
-<!---->
-<!--<table>-->
-<!--    <tr>-->
-<!--        <th style="padding: 10px; border: 1px solid black;">Nom</th>-->
-<!--        <th style="padding: 10px; border: 1px solid black;">Attempts</th>-->
-<!--        <th style="padding: 10px; border: 1px solid black;">Temps écoulé</th>-->
-<!--    </tr>-->
-<!--    --><?php
-//    while ($row = $result->fetch_assoc()) {
-//        echo "<tr>";
-//        echo "<tr>";
-//        echo "<td style=\"padding: 10px; border: 1px solid black;\">".$row['nom']."</td>";
-//        echo "<td style=\"padding: 10px; border: 1px solid black;\">" .$row['attempts']."</td>";
-//        echo "<td style=\"padding: 10px; border: 1px solid black;\">" .$row['temps_ecoule']."</td>";
-//        echo "</tr>";
-//        echo "</tr>";
-//
-//    }
-//
-//    ?>
-<!--</table>-->
-<!--</body>-->
-<!---->
-<!--</html>-->
-<!---->
+session_start();
+require_once 'config.php';
 
-<?php
-mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT); // Add this line for error reporting
-
-$conn = mysqli_connect("localhost", "root", "", "TP3"); // Connect to the database
-$conn->set_charset("utf8"); // Set the character set
-$result = $conn->query("SELECT * FROM article ORDER BY attempts ASC, temps_ecoule ASC");
-
+$result = mysqli_connect("localhost", "root", "", "TP3")->query("SELECT * FROM article ORDER BY attempts ASC, temps_ecoule ASC");
 ?>
 
 <!DOCTYPE html>
@@ -62,20 +17,40 @@ $result = $conn->query("SELECT * FROM article ORDER BY attempts ASC, temps_ecoul
 <table>
     <tr>
         <th style="padding: 10px; border: 1px solid black;">Nom</th>
-        <th style="padding: 10px; border: 1px solid black;">Attempts</th>
         <th style="padding: 10px; border: 1px solid black;">Temps écoulé</th>
+        <th style="padding: 10px; border: 1px solid black;">Attempts</th>
     </tr>
     <?php
-    while ($row = $result->fetch_assoc()) {
+    $i = 0;
+    while (($row = $result->fetch_assoc()) && ($i < 10)) {
         echo "<tr>";
         echo "<td style=\"padding: 10px; border: 1px solid black;\">" . $row['nom'] . "</td>";
-        echo "<td style=\"padding: 10px; border: 1px solid black;\">" . $row['attempts'] . "</td>";
         echo "<td style=\"padding: 10px; border: 1px solid black;\">" . $row['temps_ecoule'] . "</td>";
+        echo "<td style=\"padding: 10px; border: 1px solid black;\">" . $row['attempts'] . "</td>";
         echo "</tr>";
+        $i++;
     }
     ?>
 </table>
 
-<a href="/exo1serie3/jeu_exo1.php">Retour à l'accueil</a>
+<?php
+if (isset($_POST["nom"])) {
+    $userName = $_POST["nom"];
+    $attempts = $_POST["attempts"];
+    $tempsEcoule = $_POST["temps_ecoule"];
+    $stmt = mysqli_connect("localhost", "root", "", "TP3")->prepare("INSERT INTO article (nom, attempts, temps_ecoule) VALUES (?, ?, ?)");
+    $stmt->bind_param("sii", $userName, $attempts, $tempsEcoule);
+
+        echo "<p>New record inserted successfully.</p>";
+
+
+    $result = mysqli_connect("localhost", "root", "", "TP3")->query("SELECT * FROM article ORDER BY attempts ASC, temps_ecoule ASC");
+}
+?>
+<a href="jeu_exo1.php">Retour à l'accueil</a>
 </body>
 </html>
+
+
+
+
